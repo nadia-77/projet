@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des visiteurs</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { background: #f0f4f8; }
+        .sidebar {
+            background: linear-gradient(180deg, #1a3a5c, #0d2137);
+            min-height: 100vh; width: 240px;
+            position: fixed; top: 0; left: 0; padding: 20px 0;
+        }
+        .sidebar .brand {
+            color: white; font-weight: bold; font-size: 15px;
+            padding: 10px 20px 25px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar a {
+            display: flex; align-items: center; gap: 10px;
+            color: rgba(255,255,255,0.7); padding: 12px 20px;
+            text-decoration: none; font-size: 14px; transition: all 0.2s;
+        }
+        .sidebar a:hover { background: rgba(255,255,255,0.15); color: white; }
+        .main { margin-left: 240px; }
+        .topbar {
+            background: white; padding: 14px 28px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        }
+        .content { padding: 28px; }
+        .card { border: none; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+    </style>
+</head>
+<body>
+
+<!-- Menu latéral -->
+<div class="sidebar">
+    <div class="brand"><i class="fas fa-university me-2"></i>Campus Visitor</div>
+    <a th:href="@{/dashboard}"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a>
+    <a th:href="@{/visiteur/liste}"><i class="fas fa-users"></i> Tous les visiteurs</a>
+    <a th:href="@{/visiteur/inscription}"><i class="fas fa-user-plus"></i> Nouveau visiteur</a>
+    <a th:href="@{/visiteur/scan}"><i class="fas fa-qrcode"></i> Scanner un badge</a>
+    <a th:href="@{/visiteur/liste(statut='EN_ATTENTE')}"><i class="fas fa-clock"></i> En attente</a>
+    <a th:href="@{/visiteur/liste(statut='ENTRE')}"><i class="fas fa-door-open"></i> Sur le campus</a>
+    <a th:href="@{/deconnexion}" style="color:#ff6b6b; margin-top:20px;">
+        <i class="fas fa-sign-out-alt"></i> Déconnexion
+    </a>
+</div>
+
+<!-- Contenu -->
+<div class="main">
+    <div class="topbar d-flex align-items-center justify-content-between">
+        <h5 class="mb-0 fw-bold">Gestion des visiteurs</h5>
+        <a th:href="@{/visiteur/inscription}" class="btn btn-success btn-sm">
+            <i class="fas fa-user-plus me-1"></i> Nouveau visiteur
+        </a>
+    </div>
+
+    <div class="content">
+
+        <!-- Messages de succès / erreur -->
+        <div th:if="${succes}" class="alert alert-success alert-dismissible fade show">
+            <i class="fas fa-check-circle me-2"></i><span th:text="${succes}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-white py-3 d-flex flex-wrap gap-3 align-items-center">
+                <h6 class="mb-0 fw-bold me-auto">
+                    <i class="fas fa-users text-primary me-2"></i>Liste des visiteurs
+                </h6>
+
+                <!-- Barre de recherche -->
+                <form th:action="@{/visiteur/liste}" method="get" class="d-flex gap-2">
+                    <input type="text" name="recherche" class="form-control form-control-sm"
+                           placeholder="Chercher par nom..." th:value="${recherche}"
+                           style="width: 200px;">
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <a th:href="@{/visiteur/liste}" class="btn btn-sm btn-outline-secondary">
+                        Tout afficher
+                    </a>
+                </form>
+
+                <!-- Filtre par statut -->
+                <form th:action="@{/visiteur/liste}" method="get">
+                    <select name="statut" class="form-select form-select-sm"
+                            onchange="this.form.submit()" style="width: 180px;">
+                        <option value="">-- Tous les statuts --</option>
+                        <option th:each="s : ${statuts}"
+                                th:value="${s.name()}"
+                                th:text="${s.name()}"
+                                th:selected="${s.name() == statutSelectionne}">
+                        </option>
+                    </select>
+                </form>
+            </div>
+
+            <div class="card-body p-0">
+
+                <!-- Si liste vide -->
+                <div th:if="${#lists.isEmpty(visiteurs)}" class="text-center py-5 text-muted">
+                    <i class="fas fa-search fa-3x mb-3 opacity-25"></i>
+                    <p>Aucun visiteur trouvé.</p>
+                    <a th:href="@{/visiteur/liste}" class="btn btn-sm btn-outline-primary">
+                        Voir tous les visiteurs
+                    </a>
+                </div>
+
+                <!-- Tableau -->
+                <table class="table table-hover mb-0" th:unless="${#lists.isEmpty(visiteurs)}">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4">Badge</th>
+                            <th>Nom complet</th>
+                            <th>Email</th>
+                            <th>Personne visitée</th>
+                            <th>Statut</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- th:each = boucle sur chaque visiteur -->
+                        <tr th:each="v : ${visiteurs}">
+
+                            <td class="ps-4">
+                                <code class="small" th:text="${v.numeroBadge}">BADGE-</code>
+                            </td>
+
+                            <td class="fw-semibold" th:text="${v.nomComplet}">Nom</td>
+                            <td class="text-muted small" th:text="${v.email}">email</td>
+                            <td th:text="${v.personneVisitee}">personne</td>
+
+                            <!-- Badge de statut -->
+                            <td>
+                                <span th:switch="${v.statut.name()}">
+                                    <span th:case="'EN_ATTENTE'" class="badge bg-warning text-dark">⏳ En attente</span>
+                                    <span th:case="'APPROUVE'"   class="badge bg-info">✅ Approuvé</span>
+                                    <span th:case="'ENTRE'"      class="badge bg-success">🟢 Sur campus</span>
+                                    <span th:case="'SORTI'"      class="badge bg-secondary">⬛ Sorti</span>
+                                    <span th:case="'REFUSE'"     class="badge bg-danger">❌ Refusé</span>
+                                    <span th:case="*"            class="badge bg-light text-dark" th:text="${v.statut}">?</span>
+                                </span>
+                            </td>
+
+                            <!-- Boutons actions -->
+                            <td class="text-center">
+                                <a th:href="@{/visiteur/detail/{id}(id=${v.id})}"
+                                   class="btn btn-sm btn-outline-primary me-1">
+                                    <i class="fas fa-eye"></i> Voir
+                                </a>
+                                <form th:action="@{/visiteur/supprimer/{id}(id=${v.id})}"
+                                      method="post" class="d-inline"
+                                      onsubmit="return confirm('Supprimer ce visiteur ?')">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pied du tableau -->
+            <div class="card-footer bg-white text-muted small">
+                <span th:text="${#lists.size(visiteurs)} + ' visiteur(s) affiché(s)'"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

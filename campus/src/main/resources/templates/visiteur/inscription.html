@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Inscription Visiteur</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { background: #f0f4f8; }
+        .header {
+            background: linear-gradient(135deg, #1a3a5c, #2e7d52);
+            color: white; padding: 30px; text-align: center;
+        }
+        .form-card {
+            border: none; border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            max-width: 700px; margin: 30px auto;
+            padding: 35px;
+        }
+        .section-titre {
+            background: linear-gradient(135deg, #1a3a5c, #2e7d52);
+            color: white; padding: 8px 16px;
+            border-radius: 8px; font-size: 13px; font-weight: 600;
+            margin-bottom: 18px;
+        }
+        .btn-envoyer {
+            background: linear-gradient(135deg, #1a3a5c, #2e7d52);
+            border: none; color: white; padding: 12px 35px;
+            border-radius: 10px; font-size: 15px; font-weight: 600;
+        }
+        .btn-envoyer:hover { opacity: 0.9; color: white; }
+    </style>
+</head>
+<body>
+
+<!-- En-tête de la page -->
+<div class="header">
+    <i class="fas fa-university fa-2x mb-2"></i>
+    <h3 class="fw-bold mb-1">Demande de Visite - Campus</h3>
+    <p class="opacity-75 mb-0">Remplissez ce formulaire pour obtenir votre badge virtuel</p>
+</div>
+
+<div class="container">
+    <div class="form-card card">
+
+        <!-- Message d'erreur général -->
+        <div th:if="${#fields.hasErrors('*')}" class="alert alert-danger mb-4">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Veuillez corriger les erreurs ci-dessous avant de continuer.
+        </div>
+
+        <!--
+            th:action  → URL où envoyer le formulaire (POST /visiteur/inscription)
+            th:object  → objet Java lié au formulaire (visiteur)
+            method     → POST pour envoyer des données
+        -->
+        <form th:action="@{/visiteur/inscription}" th:object="${visiteur}" method="post">
+
+            <!-- SECTION 1 : Informations personnelles -->
+            <div class="section-titre">
+                <i class="fas fa-user me-2"></i>Informations personnelles
+            </div>
+
+            <div class="row g-3 mb-4">
+
+                <div class="col-md-6">
+                    <label class="form-label">Nom <span class="text-danger">*</span></label>
+                    <!--
+                        th:field="*{nom}" → lie ce champ à visiteur.nom
+                        th:classappend   → ajoute "is-invalid" si erreur de validation
+                    -->
+                    <input type="text" th:field="*{nom}" class="form-control"
+                           th:classappend="${#fields.hasErrors('nom')} ? 'is-invalid'"
+                           placeholder="Ex : BENALI">
+                    <div class="invalid-feedback" th:errors="*{nom}"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Prénom <span class="text-danger">*</span></label>
+                    <input type="text" th:field="*{prenom}" class="form-control"
+                           th:classappend="${#fields.hasErrors('prenom')} ? 'is-invalid'"
+                           placeholder="Ex : Ahmed">
+                    <div class="invalid-feedback" th:errors="*{prenom}"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Email <span class="text-danger">*</span></label>
+                    <input type="email" th:field="*{email}" class="form-control"
+                           th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
+                           placeholder="ahmed@exemple.ma">
+                    <div class="invalid-feedback" th:errors="*{email}"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Téléphone <span class="text-danger">*</span></label>
+                    <input type="tel" th:field="*{telephone}" class="form-control"
+                           th:classappend="${#fields.hasErrors('telephone')} ? 'is-invalid'"
+                           placeholder="06 XX XX XX XX">
+                    <div class="invalid-feedback" th:errors="*{telephone}"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">CIN / Passeport <span class="text-danger">*</span></label>
+                    <input type="text" th:field="*{cinPasseport}" class="form-control"
+                           th:classappend="${#fields.hasErrors('cinPasseport')} ? 'is-invalid'"
+                           placeholder="Ex : AB123456">
+                    <div class="invalid-feedback" th:errors="*{cinPasseport}"></div>
+                </div>
+
+            </div>
+
+            <!-- SECTION 2 : Informations de la visite -->
+            <div class="section-titre">
+                <i class="fas fa-map-marker-alt me-2"></i>Informations de la visite
+            </div>
+
+            <div class="row g-3 mb-4">
+
+                <div class="col-md-6">
+                    <label class="form-label">Personne à visiter <span class="text-danger">*</span></label>
+                    <input type="text" th:field="*{personneVisitee}" class="form-control"
+                           th:classappend="${#fields.hasErrors('personneVisitee')} ? 'is-invalid'"
+                           placeholder="Ex : Pr. Hassan Alami">
+                    <div class="invalid-feedback" th:errors="*{personneVisitee}"></div>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Bâtiment / Département</label>
+                    <select th:field="*{batimentDestination}" class="form-select">
+                        <option value="">-- Sélectionner (optionnel) --</option>
+                        <option value="Administration">Administration</option>
+                        <option value="Bâtiment A - Sciences">Bâtiment A - Sciences</option>
+                        <option value="Bâtiment B - Informatique">Bâtiment B - Informatique</option>
+                        <option value="Bâtiment C - Langues">Bâtiment C - Langues</option>
+                        <option value="Bibliothèque">Bibliothèque</option>
+                        <option value="Amphithéâtre">Amphithéâtre</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Date de visite prévue</label>
+                    <input type="date" th:field="*{dateVisitePrevue}" class="form-control">
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Motif de la visite <span class="text-danger">*</span></label>
+                    <textarea th:field="*{motifVisite}" class="form-control" rows="3"
+                              th:classappend="${#fields.hasErrors('motifVisite')} ? 'is-invalid'"
+                              placeholder="Décrivez brièvement la raison de votre visite..."></textarea>
+                    <div class="invalid-feedback" th:errors="*{motifVisite}"></div>
+                </div>
+
+            </div>
+
+            <!-- Bouton d'envoi -->
+            <div class="text-center">
+                <button type="submit" class="btn-envoyer btn">
+                    <i class="fas fa-paper-plane me-2"></i>Envoyer ma demande
+                </button>
+            </div>
+
+            <p class="text-center text-muted small mt-3">
+                <i class="fas fa-info-circle me-1"></i>
+                Après validation, vous recevrez votre badge virtuel d'accès.
+            </p>
+
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

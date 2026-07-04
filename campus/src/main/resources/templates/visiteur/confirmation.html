@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmation - Badge Virtuel</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a3a5c, #2e7d52);
+            min-height: 100vh; display: flex; align-items: center;
+        }
+        .badge-card {
+            background: white; border-radius: 20px;
+            max-width: 480px; width: 100%; margin: auto;
+            overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .badge-header {
+            background: linear-gradient(135deg, #1a3a5c, #2e7d52);
+            color: white; padding: 28px; text-align: center;
+        }
+        .avatar {
+            width: 72px; height: 72px; border-radius: 50%;
+            background: rgba(255,255,255,0.2); border: 3px solid rgba(255,255,255,0.5);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px; font-weight: bold; margin: 0 auto 14px;
+        }
+        .numero-badge {
+            background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.4);
+            border-radius: 10px; padding: 10px 18px;
+            font-family: monospace; font-size: 17px; font-weight: bold;
+            letter-spacing: 2px; display: inline-block; margin-top: 12px;
+        }
+        .badge-body { padding: 30px; }
+        .info-ligne {
+            display: flex; gap: 12px; align-items: center;
+            padding: 10px 0; border-bottom: 1px solid #f0f0f0;
+        }
+        .info-icone {
+            width: 36px; height: 36px; background: #f0f4f8;
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        @media print {
+            body { background: white; }
+            .btn-imprimer, .btn-nouveau { display: none; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="badge-card">
+
+        <!-- En-tête du badge -->
+        <div class="badge-header">
+            <div class="d-flex justify-content-between mb-3 opacity-75 small">
+                <span><i class="fas fa-university me-1"></i> Campus</span>
+                <span>BADGE VISITEUR</span>
+            </div>
+
+            <!-- Initiales du visiteur -->
+            <div class="avatar"
+                 th:text="${visiteur.prenom.charAt(0)} + '' + ${visiteur.nom.charAt(0)}">AB</div>
+
+            <!-- Nom complet -->
+            <h4 class="fw-bold mb-1" th:text="${visiteur.nomComplet}">Nom</h4>
+            <p class="opacity-75 mb-0 small" th:text="${visiteur.motifVisite}">Motif</p>
+
+            <!-- Numéro de badge -->
+            <div class="numero-badge" th:text="${visiteur.numeroBadge}">BADGE-XXX</div>
+        </div>
+
+        <!-- Corps de la confirmation -->
+        <div class="badge-body">
+
+            <!-- Icône de succès -->
+            <div class="text-center mb-4">
+                <i class="fas fa-check-circle text-success fa-3x mb-2"></i>
+                <h5 class="fw-bold">Demande bien enregistrée !</h5>
+                <span class="badge bg-warning text-dark px-3 py-2">
+                    <i class="fas fa-clock me-1"></i> En attente d'approbation
+                </span>
+            </div>
+
+            <!-- Informations de la visite -->
+            <div class="info-ligne">
+                <div class="info-icone"><i class="fas fa-user text-primary"></i></div>
+                <div>
+                    <div class="text-muted small">Personne à visiter</div>
+                    <div class="fw-semibold" th:text="${visiteur.personneVisitee}">-</div>
+                </div>
+            </div>
+
+            <div class="info-ligne" th:if="${visiteur.batimentDestination}">
+                <div class="info-icone"><i class="fas fa-building text-success"></i></div>
+                <div>
+                    <div class="text-muted small">Destination</div>
+                    <div class="fw-semibold" th:text="${visiteur.batimentDestination}">-</div>
+                </div>
+            </div>
+
+            <div class="info-ligne" th:if="${visiteur.dateVisitePrevue}">
+                <div class="info-icone"><i class="fas fa-calendar text-warning"></i></div>
+                <div>
+                    <div class="text-muted small">Date de visite</div>
+                    <div class="fw-semibold"
+                         th:text="${#temporals.format(visiteur.dateVisitePrevue, 'dd/MM/yyyy')}">-</div>
+                </div>
+            </div>
+
+            <div class="info-ligne" style="border-bottom: none;">
+                <div class="info-icone"><i class="fas fa-envelope text-info"></i></div>
+                <div>
+                    <div class="text-muted small">Email</div>
+                    <div class="fw-semibold" th:text="${visiteur.email}">-</div>
+                </div>
+            </div>
+
+            <!-- Message d'information -->
+            <div class="alert alert-info mt-3 mb-4" style="border-radius: 12px;">
+                <i class="fas fa-info-circle me-2"></i>
+                Conservez votre numéro de badge :
+                <strong th:text="${visiteur.numeroBadge}">BADGE-XXX</strong>.
+                Un agent le validera à votre arrivée.
+            </div>
+
+            <!-- Boutons -->
+            <div class="d-grid gap-2">
+                <button onclick="window.print()" class="btn btn-primary btn-imprimer">
+                    <i class="fas fa-print me-2"></i>Imprimer ce badge
+                </button>
+                <a th:href="@{/visiteur/inscription}" class="btn btn-outline-secondary btn-nouveau">
+                    <i class="fas fa-plus me-2"></i>Nouvelle inscription
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

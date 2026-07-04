@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Scanner un badge</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { background: #f0f4f8; }
+        .sidebar {
+            background: linear-gradient(180deg, #1a3a5c, #0d2137);
+            min-height: 100vh; width: 240px;
+            position: fixed; top: 0; left: 0; padding: 20px 0;
+        }
+        .sidebar .brand { color: white; font-weight: bold; padding: 10px 20px 25px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar a { display: flex; align-items: center; gap: 10px; color: rgba(255,255,255,0.7); padding: 12px 20px; text-decoration: none; font-size: 14px; }
+        .sidebar a:hover { background: rgba(255,255,255,0.15); color: white; }
+        .main { margin-left: 240px; }
+        .topbar { background: white; padding: 14px 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+        .content { padding: 28px; }
+        .card { border: none; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="brand"><i class="fas fa-university me-2"></i>Campus Visitor</div>
+    <a th:href="@{/dashboard}"><i class="fas fa-tachometer-alt"></i> Tableau de bord</a>
+    <a th:href="@{/visiteur/liste}"><i class="fas fa-users"></i> Tous les visiteurs</a>
+    <a th:href="@{/visiteur/inscription}"><i class="fas fa-user-plus"></i> Nouveau visiteur</a>
+    <a th:href="@{/visiteur/scan}"><i class="fas fa-qrcode"></i> Scanner un badge</a>
+    <a th:href="@{/deconnexion}" style="color:#ff6b6b; margin-top:20px;"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
+</div>
+
+<div class="main">
+    <div class="topbar">
+        <h5 class="mb-0 fw-bold">Scanner un badge</h5>
+    </div>
+
+    <div class="content">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card text-center p-5">
+
+                    <div class="mb-4">
+                        <div style="width:72px; height:72px; background: linear-gradient(135deg,#1a3a5c,#2e7d52);
+                                    border-radius:16px; display:flex; align-items:center;
+                                    justify-content:center; margin: 0 auto;">
+                            <i class="fas fa-qrcode text-white fa-2x"></i>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mb-1">Identifier un visiteur</h5>
+                    <p class="text-muted mb-4">Entrez le numéro de badge pour accéder à sa fiche</p>
+
+                    <!-- Erreur si badge non trouvé -->
+                    <div th:if="${erreur}" class="alert alert-danger mb-3">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <span th:text="${erreur}">Erreur</span>
+                    </div>
+
+                    <!-- Formulaire de scan -->
+                    <form th:action="@{/visiteur/scan}" method="post">
+                        <div class="mb-3">
+                            <input type="text" name="numeroBadge"
+                                   class="form-control form-control-lg text-center"
+                                   placeholder="BADGE-20241225-0001"
+                                   style="font-family: monospace; letter-spacing: 2px;"
+                                   required autofocus>
+                            <div class="text-muted small mt-1">Format : BADGE-AAAAMMJJ-XXXX</div>
+                        </div>
+                        <button type="submit" class="btn w-100 py-3 fw-bold text-white"
+                                style="background: linear-gradient(135deg,#1a3a5c,#2e7d52); border-radius:10px; border:none;">
+                            <i class="fas fa-search me-2"></i>Rechercher
+                        </button>
+                    </form>
+
+                    <hr class="my-4">
+                    <p class="text-muted small mb-0">
+                        Ou <a th:href="@{/visiteur/liste}">chercher dans la liste complète</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
